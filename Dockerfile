@@ -16,7 +16,7 @@ RUN curl -Lo /tmp/sonar.zip https://binaries.sonarsource.com/Distribution/sonar-
 WORKDIR /app
 
 # Copy app code and install dependencies
-COPY package*.json ./
+COPY package.json package-lock.json /app/
 RUN npm install
 
 COPY . .
