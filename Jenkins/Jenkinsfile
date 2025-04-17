@@ -10,7 +10,7 @@ pipeline {
             nodejs 'node17'
         }
     environment {
-       SCANNER_HOME=tool 'sonar-scanner'
+       //SCANNER_HOME=tool 'sonar-scanner'
         //IMAGE_NAME = 'iamtanya28/starbucks-app:latest'
     }
     stages {
@@ -22,7 +22,7 @@ pipeline {
 stage("Sonarqube Analysis "){
             steps{
                 withSonarQubeEnv('SonarQube') {
-                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=starbucks \
+                    sh '''   sh 'sonar-scanner -Dsonar.projectName=starbucks \
                     -Dsonar.projectKey=starbucks '''
                 }
             }
