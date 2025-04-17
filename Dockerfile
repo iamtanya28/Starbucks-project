@@ -1,20 +1,44 @@
-# Use Node.js Alpine base image
-FROM node:alpine
+# Stage 1: Build Stage
+FROM node:alpine AS builder
 
-# Create and set the working directory inside the container
+# Set working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json to the working directory
-COPY package.json package-lock.json /app/
+# Install build dependencies
+RUN apk add --no-cache curl unzip git
 
-# Install dependencies
+# Copy package.json and package-lock.json first for efficient caching
+COPY package.json package-lock.json ./
+
+# Install dependencies (including dev dependencies)
 RUN npm install
 
-# Copy the entire codebase to the working directory
-COPY . /app/
+# Copy the rest of the application source code
+COPY . .
 
-# Expose the port your container app
+# Build the application (if applicable)
+RUN npm run build
+
+# Install Sonar Scanner CLI
+RUN curl -o sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip && \
+    unzip sonar-scanner.zip && \
+    mv sonar-scanner-5.0.1.3006-linux /opt/sonar-scanner && \
+    ln -s /opt/sonar-scanner/bin/sonar-scanner /usr/bin/sonar-scanner && \
+    rm -rf sonar-scanner.zip
+
+# Stage 2: Runtime Stage (Final, Minimal Image)
+FROM node:alpine AS runtime
+
+# Set working directory
+WORKDIR /app
+
+# Copy built application and dependencies from builder stage
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/package.json ./
+
+# Expose the application port
 EXPOSE 3000    
 
-# Define the command to start your application (replace "start" with the actual command to start your app)
+# Define the default startup command
 CMD ["npm", "start"]
