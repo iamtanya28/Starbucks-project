@@ -19,10 +19,19 @@ pipeline {
             }
         }
 
-        stage("SonarQube Analysis") {
+        // stage("SonarQube Analysis") {
+        //     steps {
+        //         withSonarQubeEnv('SonarQube') {
+        //             sh "${SONAR_HOME}/bin/sonar-scanner -Dsonar.projectName=starbucks -Dsonar.projectKey=starbucks -Dsonar.sources=."
+        //         }
+        //     }
+        // }
+stage("SonarQube Analysis") {
             steps {
+                echo "SCANNER_HOME=${SCANNER_HOME}"
+                ls -l ${SCANNER_HOME}/bin
                 withSonarQubeEnv('SonarQube') {
-                    sh "${SONAR_HOME}/bin/sonar-scanner -Dsonar.projectName=starbucks -Dsonar.projectKey=starbucks -Dsonar.sources=."
+                    sh "${SCANNER_HOME}/bin/sonar-scanner -Dsonar.projectName=starbucks -Dsonar.projectKey=starbucks"
                 }
             }
         }
