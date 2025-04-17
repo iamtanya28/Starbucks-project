@@ -1,9 +1,5 @@
 pipeline{
     agent any
-    tools{
-        jdk 'jdk'
-        nodejs 'node17'
-    }
     environment {
         SCANNER_HOME=tool 'sonar-scanner'
     }
@@ -46,7 +42,7 @@ pipeline{
         stage("Docker Build & Push"){
             steps{
                 script{
-                   withDockerRegistry(credentialsId: 'docker', toolName: 'docker'){   
+                   withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker'){   
                        sh "docker build -t starbucks ."
                        sh "docker tag starbucks iamtanya28/starbucks:latest "
                        sh "docker push iamtanya28/starbucks:latest "
