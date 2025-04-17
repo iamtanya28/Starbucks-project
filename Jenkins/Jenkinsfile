@@ -34,10 +34,13 @@ pipeline {
     
 stage("SonarQube Analysis") {
     steps {
-        withSonarQubeEnv('SonarQube') {
-            sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=starbucks \
-            -Dsonar.projectKey=starbucks '''
-        }
+        // withSonarQubeEnv('SonarQube') {
+        //     sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=starbucks \
+        //     -Dsonar.projectKey=starbucks '''
+        // }
+withSonarQubeEnv('SonarQube') {
+    sh "/opt/sonar-scanner/bin/sonar-scanner -Dsonar.projectName=starbucks -Dsonar.projectKey=starbucks"
+}
     }
 }
 
