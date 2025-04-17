@@ -10,8 +10,8 @@ pipeline {
             nodejs 'node17'
         }
     environment {
-       // SCANNER_HOME=tool 'sonar-scanner'
-        IMAGE_NAME = 'iamtanya28/starbucks-app:latest'
+       SCANNER_HOME=tool 'sonar-scanner'
+        //IMAGE_NAME = 'iamtanya28/starbucks-app:latest'
     }
     stages {
         stage('Checkout') {
@@ -19,23 +19,21 @@ pipeline {
                 sh 'echo passed'
             }
         }
-stage("SonarQube Analysis") {
-    steps {
-        withSonarQubeEnv('SonarQube') {
-            sh ''' sonar-scanner -Dsonar.projectName=starbucks \
-            -Dsonar.projectKey=starbucks '''
-        }
-
-    }
-}
-
-        stage("Quality Gate") {
-            steps {
-                script {
-                    waitForQualityGate abortPipeline: false, credentialsId: 'SonarScanner'
+stage("Sonarqube Analysis "){
+            steps{
+                withSonarQubeEnv('SonarQube') {
+                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=starbucks \
+                    -Dsonar.projectKey=starbucks '''
                 }
             }
-        }
+}
+        // stage("Quality Gate") {
+        //     steps {
+        //         script {
+        //             waitForQualityGate abortPipeline: false, credentialsId: 'SonarScanner'
+        //         }
+        //     }
+        // }
 
         stage('Install Dependencies') {
             steps {
