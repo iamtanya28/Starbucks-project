@@ -6,7 +6,7 @@ pipeline {
         }
     }
 environment {
-        SCANNER_HOME=tool 'Sonar'
+        SCANNER_HOME=tool 'Sonar', type: 'ToolType'
     }
 
     stages {
