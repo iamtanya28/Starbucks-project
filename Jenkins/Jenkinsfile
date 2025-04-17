@@ -5,15 +5,16 @@ pipeline {
             args '-v /var/run/docker.sock:/var/run/docker.sock'
         }
     }
-    environment {
-        SCANNER_HOME = tool 'SonarScanner'
 
+    environment {
+        IMAGE_NAME = 'iamtanya28/starbucks-app:latest'
     }
 
     stages {
         stage('Checkout') {
             steps {
                 sh 'echo passed'
+                // Uncomment when ready:
                 // git branch: 'main', credentialsId: 'github-token', url: 'https://github.com/iamtanya28/Starbucks-project.git'
             }
         }
@@ -21,8 +22,12 @@ pipeline {
         stage("SonarQube Analysis") {
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    sh '''$SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=starbucks \
-                    -Dsonar.projectKey=starbucks'''
+                    sh '''
+                        sonar-scanner \
+                        -Dsonar.projectName=starbucks \
+                        -Dsonar.projectKey=starbucks \
+                        -Dsonar.sources=.
+                    '''
                 }
             }
         }
@@ -51,9 +56,7 @@ pipeline {
 
         stage('Build Docker Image') {
             steps {
-                sh '''
-                    docker build -t $IMAGE_NAME .
-                '''
+                sh 'docker build -t $IMAGE_NAME .'
             }
         }
 
@@ -75,17 +78,18 @@ pipeline {
 
         stage('Deploy to Docker Container') {
             steps {
-                sh 'docker run -d --name starbucks -p 3000:3000 $IMAGE_NAME'
+                sh 'docker run -d --name starbucks -p 3000:3000 $IMAGE_NAME || true'
             }
         }
-    }  // <-- This was missing
+    }
 
+    // Optional: Add back post block if you want email notification.
     // post {
     //     always {
     //         script {
     //             def buildStatus = currentBuild.currentResult
     //             def buildUser = currentBuild.getBuildCauses('hudson.model.Cause$UserIdCause')[0]?.userId ?: 'Github User'
-
+    //
     //             emailext (
     //                 subject: "Pipeline ${buildStatus}: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
     //                 body: """
@@ -97,8 +101,6 @@ pipeline {
     //                     <p>Build URL: <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
     //                 """,
     //                 to: 'tanyaaps2808@gmail.com',
-    //                 from: 'tanyaaps2808@gmail.com',
-    //                 replyTo: 'tanyaaps2808@gmail.com',
     //                 mimeType: 'text/html',
     //                 attachmentsPattern: 'trivyfs.txt,trivyimage.txt'
     //             )
