@@ -5,11 +5,9 @@ pipeline {
             args '-v /var/run/docker.sock:/var/run/docker.sock'
         }
     }
-
-    // environment {
-    //     SCANNER_HOME = tool 'sonar-scanner'
-    //     IMAGE_NAME = 'iamtanya28/starbucks:latest'
-    // }
+environment {
+        SCANNER_HOME=tool 'sonar-scanner'
+    }
 
     stages {
         stage('Checkout') {
