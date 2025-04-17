@@ -1,6 +1,7 @@
-FROM node:alpine
+# ---------- Stage 1: Build & Sonar ----------
+FROM node:alpine AS build
 
-# Install required tools
+# Install build-time tools
 RUN apk add --no-cache curl unzip openjdk11
 
 # Install SonarScanner
@@ -11,15 +12,30 @@ RUN curl -o /tmp/sonar.zip -L https://binaries.sonarsource.com/Distribution/sona
     ln -s /opt/sonar-scanner-${SONAR_SCANNER_VERSION}-linux /opt/sonar-scanner && \
     ln -s /opt/sonar-scanner/bin/sonar-scanner /usr/local/bin/sonar-scanner
 
-# Create working directory
+# Set work directory
 WORKDIR /app
 
-# Copy and install dependencies
+# Copy only package files and install deps
 COPY package*.json ./
 RUN npm install
 
-# Copy source code
+# Copy rest of the app
 COPY . .
+
+# Optional: run tests or lint here if needed
+# RUN npm test
+
+# ---------- Stage 2: Production Image ----------
+FROM node:alpine
+
+# Create app directory
+WORKDIR /app
+
+# Copy only the needed runtime files from the build stage
+COPY --from=build /app /app
+
+# Install only production dependencies
+RUN npm install --production
 
 # Expose the app port
 EXPOSE 3000
