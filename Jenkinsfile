@@ -1,10 +1,11 @@
 pipeline {
-    agent {
-        docker {
-            image 'maven:3.9-eclipse-temurin-17'  // Base image with Maven + Java
-            args '-v /var/run/docker.sock:/var/run/docker.sock' // Mount Docker socket
-        }
+   agent {
+    docker {
+        image 'node:18-bullseye'
+        args '-v /var/run/docker.sock:/var/run/docker.sock'
     }
+}
+
 
     environment {
         SCANNER_HOME = tool 'sonar-scanner'
