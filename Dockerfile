@@ -1,43 +1,45 @@
-# ---------- Stage 1: Build & Sonar ----------
-FROM node:alpine AS build
+### --------- Stage 1: Sonar Scanner & Build ---------
+FROM node:18-alpine as build
 
-# Install build-time tools
+# Install dependencies for SonarScanner
 RUN apk add --no-cache curl unzip openjdk11
 
-# Install SonarScanner
+# Install SonarScanner CLI
 ENV SONAR_SCANNER_VERSION=5.0.1.3006
-RUN curl -o /tmp/sonar.zip -L https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SONAR_SCANNER_VERSION}-linux.zip && \
+RUN curl -Lo /tmp/sonar.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SONAR_SCANNER_VERSION}-linux.zip && \
     unzip /tmp/sonar.zip -d /opt && \
     rm /tmp/sonar.zip && \
     ln -s /opt/sonar-scanner-${SONAR_SCANNER_VERSION}-linux /opt/sonar-scanner && \
     ln -s /opt/sonar-scanner/bin/sonar-scanner /usr/local/bin/sonar-scanner
 
-# Set work directory
+# Set working directory
 WORKDIR /app
 
-# Copy only package files and install deps
+# Copy app code and install dependencies
 COPY package*.json ./
 RUN npm install
 
-# Copy rest of the app
 COPY . .
 
-# Optional: run tests or lint here if needed
-# RUN npm test
+# Run SonarQube scan (optional here if you want it during image build)
+# RUN sonar-scanner \
+#     -Dsonar.projectKey=starbucks \
+#     -Dsonar.projectName=starbucks \
+#     -Dsonar.sources=.
 
-# ---------- Stage 2: Production Image ----------
-FROM node:alpine
+### --------- Stage 2: Runtime Container ---------
+FROM node:18-alpine
 
-# Create app directory
+# Set working directory
 WORKDIR /app
 
-# Copy only the needed runtime files from the build stage
+# Copy only the built app from the previous stage
 COPY --from=build /app /app
 
-# Install only production dependencies
-RUN npm install --production
+# Install runtime dependencies only (if needed)
+RUN npm install --omit=dev
 
-# Expose the app port
+# Expose the application port
 EXPOSE 3000
 
 # Start the app
