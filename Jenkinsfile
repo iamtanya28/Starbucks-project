@@ -12,7 +12,7 @@ pipeline{
         }
         stage("Sonarqube Analysis "){
             steps{
-                withSonarQubeEnv('SonarQube') {
+                withSonarQubeEnv('MySonarQube') {
                     sh 'mvn sonar:sonar'
                     // sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=starbucks \
                     // -Dsonar.projectKey=starbucks '''
