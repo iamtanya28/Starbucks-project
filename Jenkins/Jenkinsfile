@@ -19,9 +19,10 @@ pipeline {
                 sh 'echo passed'
             }
         }
-        stage("Install SonarQube Scanner") {
+       stage("Install curl and SonarQube Scanner") {
             steps {
                 sh '''
+                    apt-get update && apt-get install -y curl unzip
                     curl -sS https://downloads.sonarqube.org/sonar-scanner-cli/sonar-scanner-4.6.2.2472-linux.zip -o sonar-scanner.zip
                     unzip sonar-scanner.zip -d /opt/
                     export PATH=$PATH:/opt/sonar-scanner-4.6.2.2472-linux/bin
