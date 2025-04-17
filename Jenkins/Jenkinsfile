@@ -1,7 +1,7 @@
 pipeline {
     agent {
         docker {
-            image 'iamtanya28/npm-tanya-docker-agent:v2'
+            image 'iamtanya28/npm-tanya-docker-agent:v1'
             args '-v /var/run/docker.sock:/var/run/docker.sock'
         }
     }
