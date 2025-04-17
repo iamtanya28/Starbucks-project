@@ -4,22 +4,22 @@ FROM node:alpine AS builder
 # Set working directory
 WORKDIR /app
 
-# Install dependencies required for building the app
-RUN apk add --no-cache curl unzip git openjdk17
+# Install build dependencies (Java, curl, unzip)
+RUN apk add --no-cache openjdk17 curl unzip
 
-# Copy package.json and package-lock.json first to leverage Docker cache
+# Copy package.json and package-lock.json first for caching
 COPY package.json package-lock.json ./
 
-# Install all dependencies, including dev dependencies
+# Install dependencies (including dev dependencies for build process)
 RUN npm install
 
-# Copy the entire source code
+# Copy the rest of the source code
 COPY . .
 
-# Build the application (if applicable)
-RUN npm run build
+# Build the application (if required)
+RUN npm run build || echo "No build step needed"
 
-# Install Sonar Scanner CLI
+# Install Sonar Scanner
 RUN curl -o sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip && \
     unzip sonar-scanner.zip && \
     mv sonar-scanner-5.0.1.3006-linux /opt/sonar-scanner && \
@@ -32,14 +32,17 @@ FROM node:alpine AS runtime
 # Set working directory
 WORKDIR /app
 
-# Install only runtime dependencies (skip dev dependencies)
+# Install only required runtime dependencies
 RUN apk add --no-cache openjdk17
 
-# Copy built application and dependencies from builder stage
+# Copy built application from builder stage
 COPY --from=builder /app .
 
-# Expose the application port
-EXPOSE 3000    
+# Set Java path explicitly for Sonar Scanner
+ENV JAVA_HOME="/usr/lib/jvm/java-17-openjdk"
+ENV PATH="$JAVA_HOME/bin:$PATH"
+ENV SONAR_SCANNER_OPTS="-Djava.home=$JAVA_HOME"
 
-# Define the default startup command
+EXPOSE 3000
+
 CMD ["npm", "start"]
