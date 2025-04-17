@@ -16,6 +16,12 @@ pipeline {
     }
 
     stages {
+        stage('clean workspace'){
+            steps{
+                cleanWs()
+            }
+        }
+
         stage('Checkout') {
             steps {
                 sh 'echo passed'
@@ -27,10 +33,9 @@ pipeline {
     
 stage("SonarQube Analysis") {
     steps {
-        echo "SCANNER_HOME=${SCANNER_HOME}"
-        sh "ls -l ${SCANNER_HOME}/bin" // Change is here, replacing the problematic 'ls' line
         withSonarQubeEnv('SonarQube') {
-            sh "${SCANNER_HOME}/bin/sonar-scanner -Dsonar.projectName=starbucks -Dsonar.projectKey=starbucks"
+            sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=starbucks \
+            -Dsonar.projectKey=starbucks '''
         }
     }
 }
