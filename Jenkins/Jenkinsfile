@@ -9,25 +9,16 @@ pipeline {
             jdk 'jdk'
             nodejs 'node17'
         }
-
     environment {
         SCANNER_HOME=tool 'sonar-scanner'
         IMAGE_NAME = 'iamtanya28/starbucks-app:latest'
     }
-
     stages {
-
-
         stage('Checkout') {
             steps {
-                checkout scm
                 sh 'echo passed'
-                // Uncomment when ready:
-                // git branch: 'main', credentialsId: 'github-token', url: 'https://github.com/iamtanya28/Starbucks-project.git'
             }
         }
-
-    
 stage("SonarQube Analysis") {
     steps {
         withSonarQubeEnv('SonarQube') {
