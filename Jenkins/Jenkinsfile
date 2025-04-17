@@ -22,7 +22,7 @@ pipeline {
         stage("SonarQube Analysis") {
             steps {
                 withSonarQubeEnv('MySonarQube') {
-                    sh 'mvn sonar:sonar || echo "Skipping Maven as this is an npm project."'
+                    sh 'mvn sonar:sonar'
                     // If using SonarScanner CLI for npm project:
                     // sh '$SCANNER_HOME/bin/sonar-scanner -Dsonar.projectKey=starbucks -Dsonar.sources=. -Dsonar.host.url=$SONAR_HOST_URL -Dsonar.login=<token>'
                 }
