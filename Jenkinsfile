@@ -4,21 +4,18 @@ pipeline{
         SCANNER_HOME=tool 'sonar-scanner'
     }
     stages {
-        stage('clean workspace'){
+        stage('Checkout'){
             steps{
-                cleanWs()
-            }
-        }
-        stage('Checkout from Git'){
-            steps{
-                git branch: 'main', credentialsId: 'github-token', url: 'https://github.com/iamtanya28/Starbucks-project.git'
+              sh 'echo passed'
+                //git branch: 'main', credentialsId: 'github-token', url: 'https://github.com/iamtanya28/Starbucks-project.git'
             }
         }
         stage("Sonarqube Analysis "){
             steps{
                 withSonarQubeEnv('SonarQube') {
-                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=starbucks \
-                    -Dsonar.projectKey=starbucks '''
+                    sh 'mvn sonar:sonar'
+                    // sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=starbucks \
+                    // -Dsonar.projectKey=starbucks '''
                 }
             }
         }
