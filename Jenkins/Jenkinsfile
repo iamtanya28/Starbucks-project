@@ -9,10 +9,10 @@ pipeline {
             jdk 'jdk'
             nodejs 'node17'
         }
-    environment {
-       //SCANNER_HOME=tool 'sonar-scanner'
-        //IMAGE_NAME = 'iamtanya28/starbucks-app:latest'
-    }
+    // environment {
+    //    //SCANNER_HOME=tool 'sonar-scanner'
+    //     IMAGE_NAME = 'iamtanya28/starbucks-app:latest'
+    // }
     stages {
         stage('Checkout') {
             steps {
