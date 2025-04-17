@@ -4,11 +4,11 @@ pipeline {
             image 'iamtanya28/npm-tanya-docker-agent:v1'
             args '-v /var/run/docker.sock:/var/run/docker.sock'
         }
+    }
         tools {
             jdk 'jdk'
             nodejs 'node17'
         }
-    }
 
     environment {
         SCANNER_HOME=tool 'sonar-scanner'
