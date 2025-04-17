@@ -77,7 +77,7 @@ pipeline {
                 sh 'docker run -d --name starbucks -p 3000:3000 $IMAGE_NAME'
             }
         }
-    }
+    }  // <-- This was missing
 
     // post {
     //     always {
@@ -93,4 +93,15 @@ pipeline {
     //                     <p>Build Number: ${env.BUILD_NUMBER}</p>
     //                     <p>Build Status: ${buildStatus}</p>
     //                     <p>Started by: ${buildUser}</p>
-    //                     <p>Build
+    //                     <p>Build URL: <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
+    //                 """,
+    //                 to: 'tanyaaps2808@gmail.com',
+    //                 from: 'tanyaaps2808@gmail.com',
+    //                 replyTo: 'tanyaaps2808@gmail.com',
+    //                 mimeType: 'text/html',
+    //                 attachmentsPattern: 'trivyfs.txt,trivyimage.txt'
+    //             )
+    //         }
+    //     }
+    // }
+}
