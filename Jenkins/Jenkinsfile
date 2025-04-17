@@ -50,7 +50,7 @@ pipeline {
                     withCredentials([string(credentialsId: 'SonarQube', variable: 'SONAR_LOGIN')])
                      {
 
-                        sh 'sonar-scanner -Dsonar.projectKey=$SONAR_PROJECT_KEY -Dsonar.login=$SONAR_LOGIN'
+                        sh "/var/lib/jenkins/tools/hudson.plugins.sonar.SonarRunnerInstallation/Sonar/bin/sonar-scanner -X -Dsonar.host.url=http://50.19.78.170:9000 -Dsonar.login=${SONAR_LOGIN} -Dsonar.projectName=${env.JOB_NAME} -Dsonar.projectVersion=${env.BUILD_NUMBER} -Dsonar.projectKey=${env.JOB_BASE_NAME} -Dsonar.sources=src -Dsonar.language=js"
                     }
                 }
             }
