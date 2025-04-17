@@ -4,11 +4,11 @@ pipeline {
             image 'iamtanya28/npm-tanya-docker-agent:v1'
             args '-v /var/run/docker.sock:/var/run/docker.sock'
         }
-        tools {
+    }
+  tools {
             jdk 'jdk'
             nodejs 'node17'
         }
-    }
 
     environment {
         SCANNER_HOME=tool 'sonar-scanner'
@@ -27,7 +27,7 @@ pipeline {
         stage("SonarQube Analysis") {
             steps {
                 withSonarQubeEnv('SonarQube') {
-                    sh "${SONAR_HOME}/bin/sonar-scanner -Dsonar.projectName=starbucks -Dsonar.projectKey=starbucks"
+                    sh "${SONAR_HOME}/bin/sonar-scanner -Dsonar.projectName=starbucks -Dsonar.projectKey=starbucks -Dsonar.sources=."
                 }
             }
         }
