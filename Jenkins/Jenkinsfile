@@ -6,10 +6,10 @@ pipeline {
         }
     }
 
-    environment {
-        SCANNER_HOME = tool 'sonar-scanner'
-        IMAGE_NAME = 'iamtanya28/starbucks:latest'
-    }
+    // environment {
+    //     SCANNER_HOME = tool 'sonar-scanner'
+    //     IMAGE_NAME = 'iamtanya28/starbucks:latest'
+    // }
 
     stages {
         stage('Checkout') {
