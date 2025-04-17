@@ -16,33 +16,24 @@ pipeline {
     }
 
     stages {
+        stage('Setup curl and Sonar Scanner') {
+            steps {
+                sh '''
+               sudo apt-get update && sudo apt-get install -y curl unzip && \
+                curl -o sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip && \
+                unzip sonar-scanner.zip && \
+                mv sonar-scanner-5.0.1.3006-linux /opt/sonar-scanner && \
+                export PATH=$PATH:/opt/sonar-scanner/bin
+                '''
+            }
+        }
         stage('Checkout from Git') {
             steps {
                 sh "echo passed checkout"
                 // git branch: 'main', credentialsId: 'github-token', url: 'https://github.com/Aseemakram19/starbucks-kubernetes.git'
             }
         }
-        stage('Setup Sonar Scanner') {
-            steps {
-                sh '''
-                curl -o sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip &&
-                unzip sonar-scanner.zip &&
-                mv sonar-scanner-5.0.1.3006-linux /opt/sonar-scanner &&
-                export PATH=$PATH:/opt/sonar-scanner/bin
-                '''
-            }
-        }
-        stage('Setup curl') {
-            steps {
-                sh '''
-                sudo apt-get update && sudo apt-get install -y curl unzip &&
-                curl -o sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-5.0.1.3006-linux.zip &&
-                unzip sonar-scanner.zip &&
-                mv sonar-scanner-5.0.1.3006-linux /opt/sonar-scanner &&
-                export PATH=$PATH:/opt/sonar-scanner/bin
-                '''
-            }
-        }
+        
         // stage("Sonarqube Analysis") {
         //     steps {
         //         withSonarQubeEnv('SonarQube') {
