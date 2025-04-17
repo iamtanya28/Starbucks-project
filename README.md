@@ -1,4 +1,4 @@
-## Hi there! this my new project
+# Hi there! This my new project
 **Welcome to the Starbuck App Deployment project! This project demonstrates how to deploy a StarBucks Clone Next.js application on Kubernetes cluster using modern DevOps tools, practices and following a DevSecOps approach.**
 
 ## 🛠️ **Tools & Services Used**
@@ -48,11 +48,7 @@ Watch the step-by-step deployment process:
 | **DevOps Project , Application deployment on App server via Terraform, Jenkins, SonarQube**                     | [![YouTube](https://img.shields.io/badge/YouTube-FF0000?style=flat-square&logo=youtube&logoColor=white)](https://youtu.be/xGWx_cXb9DE) |
 | **Realtime NODE.js App deployment with PM2 , Shell script, Jenkins, SonarQube ,Github ,Domain SSL cert**                     | [![YouTube](https://img.shields.io/badge/YouTube-FF0000?style=flat-square&logo=youtube&logoColor=white)](https://youtu.be/MFtUCfQ1RX0) |
 
-## 🤝 **Connect with Me**
 
-Let's connect and discuss DevSecOps  
-
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/mohammed-aseem-akram/)  
 
 
 
