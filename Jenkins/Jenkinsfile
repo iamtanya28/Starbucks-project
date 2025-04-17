@@ -24,6 +24,7 @@ pipeline {
 
         stage('Checkout') {
             steps {
+                checkout scm
                 sh 'echo passed'
                 // Uncomment when ready:
                 // git branch: 'main', credentialsId: 'github-token', url: 'https://github.com/iamtanya28/Starbucks-project.git'
