@@ -5,10 +5,9 @@ pipeline {
             args '-v /var/run/docker.sock:/var/run/docker.sock'
         }
     }
-environment {
-    SCANNER_HOME = tool name: 'Sonar', type: 'ToolType'  // If type is required
-}
-}
+    environment {
+        SCANNER_HOME = tool name: 'Sonar', type: 'ToolType'  // If type is required
+    }
 
     stages {
         stage('Checkout') {
@@ -18,15 +17,14 @@ environment {
             }
         }
 
-       stage("SonarQube Analysis") {
-    steps{
+        stage("SonarQube Analysis") {
+            steps {
                 withSonarQubeEnv('SonarQube') {
-                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=starbucks \
-                    -Dsonar.projectKey=starbucks '''
+                    sh '''$SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=starbucks \
+                    -Dsonar.projectKey=starbucks'''
                 }
             }
-}
-
+        }
 
         stage("Quality Gate") {
             steps {
@@ -49,7 +47,8 @@ environment {
                 '''
             }
         }
- stage('Build Docker Image') {
+
+        stage('Build Docker Image') {
             steps {
                 sh '''
                     docker build -t $IMAGE_NAME .
@@ -57,14 +56,13 @@ environment {
             }
         }
 
-     stage('Push Docker Image') {
-    steps {
-        withDockerRegistry(credentialsId: 'docker-cred', url: 'https://index.docker.io/v1/') {
-            sh 'docker push $IMAGE_NAME'
+        stage('Push Docker Image') {
+            steps {
+                withDockerRegistry(credentialsId: 'docker-cred', url: 'https://index.docker.io/v1/') {
+                    sh 'docker push $IMAGE_NAME'
+                }
+            }
         }
-    }
-}
-
 
         stage("Trivy Image Scan") {
             steps {
@@ -95,15 +93,4 @@ environment {
     //                     <p>Build Number: ${env.BUILD_NUMBER}</p>
     //                     <p>Build Status: ${buildStatus}</p>
     //                     <p>Started by: ${buildUser}</p>
-    //                     <p>Build URL: <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
-    //                 """,
-    //                 to: 'tanyaaps2808@gmail.com',
-    //                 from: 'tanyaaps2808@gmail.com',
-    //                 replyTo: 'tanyaaps2808@gmail.com',
-    //                 mimeType: 'text/html',
-    //                 attachmentsPattern: 'trivyfs.txt,trivyimage.txt'
-    //             )
-    //         }
-    //     }
-    // }
-}
+    //                     <p>Build
