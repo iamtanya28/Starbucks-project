@@ -20,18 +20,12 @@ pipeline {
         }
 
        stage("SonarQube Analysis") {
-    steps {
-        withSonarQubeEnv('MySonarQube') {
-            sh '''
-                $SCANNER_HOME/bin/sonar-scanner \
-                -Dsonar.projectKey=starbucks \
-                -Dsonar.sources=. \
-                -Dsonar.javascript.lcov.reportPaths=coverage/lcov.info \
-                -Dsonar.host.url=$SONAR_HOST_URL \
-                -Dsonar.login=$SONAR_AUTH_TOKEN
-            '''
-        }
-    }
+    steps{
+                withSonarQubeEnv('SonarQube') {
+                    sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=starbucks \
+                    -Dsonar.projectKey=starbucks '''
+                }
+            }
 }
 
 
