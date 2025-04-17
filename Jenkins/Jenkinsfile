@@ -24,15 +24,16 @@ pipeline {
             }
         }
 
-        stage("SonarQube Analysis") {
-            steps {
-                echo "SCANNER_HOME=${SCANNER_HOME}"
-                ls -l ${SCANNER_HOME}/bin
-                withSonarQubeEnv('SonarQube') {
-                    sh "${SCANNER_HOME}/bin/sonar-scanner -Dsonar.projectName=starbucks -Dsonar.projectKey=starbucks"
-                }
-            }
+    
+stage("SonarQube Analysis") {
+    steps {
+        echo "SCANNER_HOME=${SCANNER_HOME}"
+        sh "ls -l ${SCANNER_HOME}/bin" // Change is here, replacing the problematic 'ls' line
+        withSonarQubeEnv('SonarQube') {
+            sh "${SCANNER_HOME}/bin/sonar-scanner -Dsonar.projectName=starbucks -Dsonar.projectKey=starbucks"
         }
+    }
+}
 
         stage("Quality Gate") {
             steps {
