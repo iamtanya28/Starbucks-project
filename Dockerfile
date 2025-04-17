@@ -1,5 +1,5 @@
 ### --------- Stage 1: Sonar Scanner & Build ---------
-FROM node:18-alpine as build
+FROM node:18-alpine AS build
 
 # Install dependencies for SonarScanner
 RUN apk add --no-cache curl unzip openjdk11
