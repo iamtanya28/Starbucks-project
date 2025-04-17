@@ -22,7 +22,7 @@ pipeline {
 stage("Sonarqube Analysis "){
             steps{
                 withSonarQubeEnv('SonarQube') {
-                    sh '''   sh sonar-scanner -Dsonar.projectName=starbucks \
+                    sh '''   sonar-scanner -Dsonar.projectName=starbucks \
                     -Dsonar.projectKey=starbucks \
                     -Dsonar.host.url=$SONARQUBE_URL '''
                 }
