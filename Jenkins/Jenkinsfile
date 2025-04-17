@@ -6,8 +6,9 @@ pipeline {
         }
     }
 environment {
-        SCANNER_HOME=tool 'Sonar', type: 'ToolType'
-    }
+    SCANNER_HOME = tool name: 'Sonar', type: 'ToolType'  // If type is required
+}
+}
 
     stages {
         stage('Checkout') {
