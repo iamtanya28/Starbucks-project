@@ -1,31 +1,28 @@
-# Use Node.js Alpine base image
 FROM node:alpine
 
-# Install dependencies required for sonar-scanner
-RUN apk update && apk add --no-cache \
-    openjdk17 wget unzip bash git
+# Install required tools
+RUN apk add --no-cache curl unzip openjdk11
 
-# Install SonarScanner CLI
+# Install SonarScanner
 ENV SONAR_SCANNER_VERSION=5.0.1.3006
-RUN wget https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SONAR_SCANNER_VERSION}-linux.zip && \
-    unzip sonar-scanner-cli-${SONAR_SCANNER_VERSION}-linux.zip -d /opt && \
-    ln -s /opt/sonar-scanner-${SONAR_SCANNER_VERSION}-linux/bin/sonar-scanner /usr/local/bin/sonar-scanner && \
-    rm sonar-scanner-cli-${SONAR_SCANNER_VERSION}-linux.zip
+RUN curl -o /tmp/sonar.zip -L https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-${SONAR_SCANNER_VERSION}-linux.zip && \
+    unzip /tmp/sonar.zip -d /opt && \
+    rm /tmp/sonar.zip && \
+    ln -s /opt/sonar-scanner-${SONAR_SCANNER_VERSION}-linux /opt/sonar-scanner && \
+    ln -s /opt/sonar-scanner/bin/sonar-scanner /usr/local/bin/sonar-scanner
 
-# Set working directory
+# Create working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json
-COPY package.json package-lock.json /app/
-
-# Install dependencies
+# Copy and install dependencies
+COPY package*.json ./
 RUN npm install
 
-# Copy the entire codebase
-COPY . /app/
+# Copy source code
+COPY . .
 
-# Expose the port your app runs on
+# Expose the app port
 EXPOSE 3000
 
-# Default command
+# Start the app
 CMD ["npm", "start"]
