@@ -1,89 +1,110 @@
-pipeline{
-    agent any
-    environment {
-        SCANNER_HOME=tool 'sonar-scanner'
+pipeline {
+    agent {
+        docker {
+            image 'maven:3.9-eclipse-temurin-17'  // Base image with Maven + Java
+            args '-v /var/run/docker.sock:/var/run/docker.sock' // Mount Docker socket
+        }
     }
+
+    environment {
+        SCANNER_HOME = tool 'sonar-scanner'
+        IMAGE_NAME = 'iamtanya28/starbucks:latest'
+    }
+
     stages {
-        stage('Checkout'){
-            steps{
-              sh 'echo passed'
-                //git branch: 'main', credentialsId: 'github-token', url: 'https://github.com/iamtanya28/Starbucks-project.git'
+        stage('Checkout') {
+            steps {
+                sh 'echo passed'
+                // git branch: 'main', credentialsId: 'github-token', url: 'https://github.com/iamtanya28/Starbucks-project.git'
             }
         }
-        stage("Sonarqube Analysis "){
-            steps{
+
+        stage("SonarQube Analysis") {
+            steps {
                 withSonarQubeEnv('MySonarQube') {
                     sh 'mvn sonar:sonar'
-                    // sh ''' $SCANNER_HOME/bin/sonar-scanner -Dsonar.projectName=starbucks \
-                    // -Dsonar.projectKey=starbucks '''
                 }
             }
         }
-        stage("quality gate"){
-           steps {
+
+        stage("Quality Gate") {
+            steps {
                 script {
-                    waitForQualityGate abortPipeline: false, credentialsId: 'Sonar-token' 
+                    waitForQualityGate abortPipeline: false, credentialsId: 'Sonar-token'
                 }
-            } 
+            }
         }
+
         stage('Install Dependencies') {
             steps {
-                sh "npm install"
-            }
-        }        
-        stage('TRIVY FS SCAN') {
-            steps {
-                sh "trivy fs . > trivyfs.txt"
+                sh '''
+                    curl -fsSL https://deb.nodesource.com/setup_18.x | bash -
+                    apt-get install -y nodejs
+                    npm install
+                '''
             }
         }
-        stage("Docker Build & Push"){
-            steps{
-                script{
-                   withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker'){   
-                       sh "docker build -t starbucks ."
-                       sh "docker tag starbucks iamtanya28/starbucks:latest "
-                       sh "docker push iamtanya28/starbucks:latest "
+
+        stage('Trivy Filesystem Scan') {
+            steps {
+                sh '''
+                    docker run --rm -v $(pwd):/project aquasec/trivy fs /project > trivyfs.txt
+                '''
+            }
+        }
+
+        stage("Docker Build & Push") {
+            steps {
+                script {
+                    withDockerRegistry(credentialsId: 'docker-cred', toolName: 'docker') {
+                        sh '''
+                            docker build -t starbucks .
+                            docker tag starbucks $IMAGE_NAME
+                            docker push $IMAGE_NAME
+                        '''
                     }
                 }
             }
         }
-        stage("TRIVY"){
-            steps{
-                sh "trivy image iamtanya28/starbucks:latest > trivyimage.txt" 
-            }
-        }
-        stage('App Deploy to Docker container'){
-            steps{
-                sh 'docker run -d --name starbucks -p 3000:3000 iamtanya28/starbucks:latest'
+
+        stage("Trivy Image Scan") {
+            steps {
+                sh '''
+                    docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image $IMAGE_NAME > trivyimage.txt
+                '''
             }
         }
 
+        stage('Deploy to Docker Container') {
+            steps {
+                sh 'docker run -d --name starbucks -p 3000:3000 $IMAGE_NAME'
+            }
+        }
     }
+
     post {
-    always {
-        script {
-            def buildStatus = currentBuild.currentResult
-            def buildUser = currentBuild.getBuildCauses('hudson.model.Cause$UserIdCause')[0]?.userId ?: 'Github User'
-            
-            emailext (
-                subject: "Pipeline ${buildStatus}: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
-                body: """
-                    <p>This is a Jenkins starbucks CICD pipeline status.</p>
-                    <p>Project: ${env.JOB_NAME}</p>
-                    <p>Build Number: ${env.BUILD_NUMBER}</p>
-                    <p>Build Status: ${buildStatus}</p>
-                    <p>Started by: ${buildUser}</p>
-                    <p>Build URL: <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
-                """,
-                to: 'tanyaaps2808@gmail.com',
-                from: 'tanyaaps2808@gmail.com',
-                replyTo: 'tanyaaps2808@gmail.com',
-                mimeType: 'text/html',
-                attachmentsPattern: 'trivyfs.txt,trivyimage.txt'
-            )
-           }
-       }
+        always {
+            script {
+                def buildStatus = currentBuild.currentResult
+                def buildUser = currentBuild.getBuildCauses('hudson.model.Cause$UserIdCause')[0]?.userId ?: 'Github User'
 
+                emailext (
+                    subject: "Pipeline ${buildStatus}: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                    body: """
+                        <p>This is a Jenkins Starbucks CICD pipeline status.</p>
+                        <p>Project: ${env.JOB_NAME}</p>
+                        <p>Build Number: ${env.BUILD_NUMBER}</p>
+                        <p>Build Status: ${buildStatus}</p>
+                        <p>Started by: ${buildUser}</p>
+                        <p>Build URL: <a href="${env.BUILD_URL}">${env.BUILD_URL}</a></p>
+                    """,
+                    to: 'tanyaaps2808@gmail.com',
+                    from: 'tanyaaps2808@gmail.com',
+                    replyTo: 'tanyaaps2808@gmail.com',
+                    mimeType: 'text/html',
+                    attachmentsPattern: 'trivyfs.txt,trivyimage.txt'
+                )
+            }
+        }
     }
-
 }
